@@ -1,0 +1,1 @@
+Best accuracy: 0.868733 with parameters Gamma: 0.4 C: 0.1
