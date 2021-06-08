@@ -186,7 +186,7 @@ Perform the specified morphological operation on input image with structure elem
 @param mSize Size of the structure element
 @param iterations Number of iterations, how many times to perform the morphological operation
 */
-void bwMorph(const cv::Mat& inputImage, cv::Mat& outputImage, const int operation, const int mShape = cv::MORPH_RECT, const int mSize = 3, const int iterations = 1)
+void bwMorph(const cv::Mat& inputImage, cv::Mat& outputImage, const int operation, const int mShape = cv::MORPH_RECT, const int mSize = 1, const int iterations = 1)
 {
 	inputImage.copyTo(outputImage);
 
@@ -219,12 +219,20 @@ void NMS(cv::Mat& img, cv::Mat& outputImg, float thresh, int kSize){
 					}
 				}
 			}
+			if(padded.at<char>(i, j) < max || padded.at<char>(i, j) < thresh){
+				output.at<char>(i, j) = 0;
+			}
+			else{
+				output.at<char>(i,j) = padded.at<char>(i,j);
+			}
+			/*
 			if(max >= thresh){
 				output.at<char>(i, j) = max;
 			}
 			else{
 				output.at<char>(i, j) = 0;
 			}
+			*/
 		}
 	}
 
@@ -263,19 +271,28 @@ std::tuple<std::vector<cv::Point2f>, std::vector<int>> getPoints(cv::Mat& image,
 	cv::normalize(sum, sum, 0.0, 255, cv::NORM_MINMAX);
 	sum.convertTo(sum, CV_8UC1, 1. / radiiSet.size());
 
-	//cv::imshow("Averaged image", sum);
+	//cv::imshow("FRST", sum);
 	//cv::waitKey(0);
 
 	//non maximal supression
-	NMS(sum, sum, 20, 3);
+	NMS(sum, sum, 15, 3);
 
-	cv::imshow("NMS", sum);
-	cv::waitKey(0);
+	//cv::imshow("NMS", sum);
+	//cv::waitKey(0);
 
 	// the frst image is grayscale, let's binarize it
 	cv::Mat markers;
 	cv::threshold(sum, sum, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-	bwMorph(sum, markers, cv::MORPH_CLOSE, cv::MORPH_ELLIPSE, 5);
+
+
+	//cv::imshow("BINARY", sum);
+	//cv::waitKey(0);
+
+	bwMorph(sum, markers, cv::MORPH_CLOSE, cv::MORPH_ELLIPSE, 5, 2);
+	//bwMorph(sum, markers, cv::MORPH_OPEN, cv::MORPH_ELLIPSE, 1, 5);
+
+	//cv::imshow("BWMORPH", markers);
+	//cv::waitKey(0);
 
 	// the 'markers' image contains dots of different size. Let's vectorize it
 	std::vector< std::vector<cv::Point> > contours;
