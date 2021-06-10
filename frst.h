@@ -225,14 +225,6 @@ void NMS(cv::Mat& img, cv::Mat& outputImg, float thresh, int kSize){
 			else{
 				output.at<char>(i,j) = padded.at<char>(i,j);
 			}
-			/*
-			if(max >= thresh){
-				output.at<char>(i, j) = max;
-			}
-			else{
-				output.at<char>(i, j) = 0;
-			}
-			*/
 		}
 	}
 
@@ -246,14 +238,6 @@ std::tuple<std::vector<cv::Point2f>, std::vector<int>> getPoints(cv::Mat& image,
 		cv::cvtColor(image, image, cv::COLOR_BGRA2BGR);
 	}
 
-	// convert to grayscale
-//	cv::Mat grayImg;
-//	cv::cvtColor(image, grayImg, cv::COLOR_BGR2GRAY);
-
-	//equalize histogram
-//	cv::equalizeHist(grayImg, grayImg);
-
-
 	//apply FRST for set of radii
 
 	std::vector<cv::Mat> images;
@@ -263,36 +247,19 @@ std::tuple<std::vector<cv::Point2f>, std::vector<int>> getPoints(cv::Mat& image,
 	cv::Mat sum = cv::Mat::zeros(image.size(), CV_64FC1);
 
 	for(int i = 0; i < images.size(); i++){
-		//cv::normalize(images[i], images[i], 0.0, 255.0, cv::NORM_MINMAX);
-		//sum.convertTo(images[i], CV_8U, 255.0);
-
 		sum += images[i];
 	}
 	cv::normalize(sum, sum, 0.0, 255, cv::NORM_MINMAX);
 	sum.convertTo(sum, CV_8UC1, 1. / radiiSet.size());
 
-	//cv::imshow("FRST", sum);
-	//cv::waitKey(0);
-
 	//non maximal supression
 	NMS(sum, sum, 15, 3);
-
-	//cv::imshow("NMS", sum);
-	//cv::waitKey(0);
 
 	// the frst image is grayscale, let's binarize it
 	cv::Mat markers;
 	cv::threshold(sum, sum, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-
-	//cv::imshow("BINARY", sum);
-	//cv::waitKey(0);
-
 	bwMorph(sum, markers, cv::MORPH_CLOSE, cv::MORPH_ELLIPSE, 5, 2);
-	//bwMorph(sum, markers, cv::MORPH_OPEN, cv::MORPH_ELLIPSE, 1, 5);
-
-	//cv::imshow("BWMORPH", markers);
-	//cv::waitKey(0);
 
 	// the 'markers' image contains dots of different size. Let's vectorize it
 	std::vector< std::vector<cv::Point> > contours;

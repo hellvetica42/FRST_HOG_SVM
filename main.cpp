@@ -85,14 +85,10 @@ int main(int argc, char* argv[]) {
 		if(roi.x >= 0 && roi.y >= 0 && roi.width + roi.x < image.cols && roi.height + roi.y < image.rows){
 			cropped = grayImg(roi);
 
-
-			//cv::equalizeHist(cropped, cropped);
-			//cv::resize(cropped, cropped, cv::Size(IMG_SIZE, IMG_SIZE), 0, 0, cv::INTER_LINEAR);
-
 			float cl = predict(cropped, svm, hog);
-			//cout<<cl<<endl;
 			cv::Point2f pt = (1/SCALE_FACTOR) * points[i];
 			int rad = (1/SCALE_FACTOR) * radius;
+
 			if(cl > 0){
 				validPoints.push_back(points[i]);
 				validRadii.push_back(radii[i]);
@@ -108,8 +104,6 @@ int main(int argc, char* argv[]) {
 	//cluster points
 	vector<vector<int>> clusters;
 	groupPoints(validPoints, clusters, MAX_DISTANCE, MIN_NEIGHBOURS);
-
-	//std::cout<<clusters.size()<<std::endl;
 
 	std::vector<cv::Point2f> finalPoints;
 	std::vector<int> finalRadii;

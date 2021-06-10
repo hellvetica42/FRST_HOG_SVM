@@ -16,7 +16,10 @@ void generateMask(cv::Mat &inImage, cv::Mat &outMask, vector<cv::Point2f> points
                        cv::Size( 2*dilation_size + 1, 2*dilation_size+1 ),
                        cv::Point( dilation_size, dilation_size ) );
 
-    cv::dilate(mask, mask, element, cv::Point(-1, -1), 2, 1, 1);
+    cv::dilate(mask, mask, element, cv::Point(-1, -1), 4, 1, 1);
+    cv::erode(mask, mask, element, cv::Point(-1, -1), 2);
+    cv::imshow("Mask", mask);
+    cv::waitKey(0);
 
     //cv::cvtColor(mask, mask, cv::COLOR_GRAY2BGR);
     //cv::imshow("mask", mask);
